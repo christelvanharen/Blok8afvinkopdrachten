@@ -6,8 +6,9 @@ import numpy as np
 
 def search_terms():
     """
-
-    @return:
+    Vraagt naar hoeveel zoektermen gezocht moeten worden en zoekt
+    daarop.
+    @return: de ingevoerde zoektermen
     """
     terms = []
     try:
@@ -22,9 +23,9 @@ def search_terms():
 
 def id(term):
     """
-
-    @param term:
-    @return:
+    Zoekt in de pubmed naar de opgegeven zoektermen.
+    @param term: de meegegeven zoekterm
+    @return: lijst met gevonden id's in de pubmed
     """
     Entrez.email = "cca.vanharen@student.han.nl"
     handle = Entrez.esearch(db="pubmed", term=term, retmax="1000")
@@ -36,9 +37,9 @@ def id(term):
 
 def get_years(idlist):
     """
-
-    @param idlist:
-    @return:
+    Zoekt naar de jaartallen bij de gevonden id's
+    @param idlist: de gevonden id's uit de pubmed
+    @return: de lijst met jaren
     """
     handle = Entrez.efetch(db="pubmed", id=idlist, rettype="medline",
                            retmode="text")
@@ -57,10 +58,10 @@ def get_years(idlist):
 
 def get_start_stop_year(years, pos):
     """
-
-    @param years:
-    @param pos:
-    @return:
+    Haalt de range op van de jaren
+    @param years: de gevonden jaartallen bij de id's
+    @param pos: de positie van de jaartallen
+    @return: de jaartallen
     """
     if years[pos] % 10 > 5:
         year = years[pos] - years[pos] % 10 + 5
@@ -71,15 +72,16 @@ def get_start_stop_year(years, pos):
             year = years[pos] - 5
         else:
             year = years[pos] - years[pos] % 10
+    # print(year)
     return year
 
 
 def make_year_count_dict(start_year, stop_year):
     """
-
-    @param start_year:
-    @param stop_year:
-    @return:
+    De jaren per 5 jaar bepalen
+    @param start_year: eerste jaar in de lijst
+    @param stop_year: laatste jaar in de lijst
+    @return: dictionary, keys; de jaren per 5, values; 0
     """
     year_count = {}
     for i in range(start_year + 1, stop_year, 5):
@@ -89,10 +91,11 @@ def make_year_count_dict(start_year, stop_year):
 
 def count_years(years, year_count):
     """
-
-    @param years:
-    @param year_count:
-    @return:
+    Telt het aantal jaren dat bij die 5 jaar hoort
+    @param years: de gevonden jaartallen bij de id's
+    @param year_count: dictionary, keys; de jaren per 5, values; 0
+    @return: dictionary, keys; de jaren per 5 jaar, values; het
+    aantal jaren
     """
     for year in years:
         for key, value in year_count.items():
@@ -103,9 +106,9 @@ def count_years(years, year_count):
 
 def get_unique_keys(year_counts):
     """
-
-    @param year_counts:
-    @return:
+    Haalt de unieke keys op uit de year_counts dictionary.
+    @param year_counts: dictionary, keys; de jaren per 5, values; 0
+    @return: unieke keys in een set
     """
     year_keys = []
     for year_count in year_counts:
@@ -117,10 +120,10 @@ def get_unique_keys(year_counts):
 
 def hits_in_list(year_counts, year_key_set):
     """
-
-    @param year_counts:
-    @param year_key_set:
-    @return:
+    Plaatst de gevonden hits in een lijst
+    @param year_counts: dictionary, keys; de jaren per 5, values; 0
+    @param year_key_set: unieke keys in een set
+    @return: de gevonden hits in een lijst
     """
     hits_counts = []
     for year_count in year_counts:
@@ -139,11 +142,12 @@ def hits_in_list(year_counts, year_key_set):
 
 def bar_plot(hits_counts, year_key_set, terms_with_results):
     """
-
-    @param hits_counts:
-    @param year_key_set:
-    @param terms_with_results:
-    @return:
+    Maakt de grafiek, met het aantal artikelen op de y-as en het
+    aantal jaren per 5 op de x-as.
+    @param hits_counts: de gevonden hits in een lijst
+    @param year_key_set: unieke keys in een set
+    @param terms_with_results: termen met resultaten
+    @return: staafdiagram
     """
     x_pos = [np.arange(len(hits_counts[0]))]
     for i in range(len(year_key_set)):
@@ -171,10 +175,8 @@ def main():
     for term in terms:
         idlist = id(term)
         years = get_years(idlist)
-        # Als er geen resultaten gevonden zijn voor een zoekterm
         if len(years) == 0:
             print("Geen resultaten gevonden voor: {}".format(term))
-        # Als er wel resultaten gevonden zijn voor een zoekterm
         else:
             terms_with_results.append(term)
             years.sort()
@@ -184,10 +186,8 @@ def main():
             year_count = count_years(years, year_count)
             year_counts.append(year_count)
 
-    # Als er geen resultaten zijn voor alle zoektermen
     if len(terms_with_results) == 0:
         sys.exit()
-    # Als minimaal 1 zoekterm resultaten oplevert
     else:
         year_key_set = get_unique_keys(year_counts)
         hits_counts = hits_in_list(year_counts, year_key_set)
