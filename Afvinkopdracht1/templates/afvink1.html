@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="Christel van Haren" content="Blok 8
+    Afvinkopdracht 1">
+    <title>Blok 8 Afvinkopdracht 1</title>
+    <link rel="stylesheet" href="/static/afvink1.css">
+</head>
+
+<body>
+    <h2>Zoeken in de gene table</h2>
+    <p>Op deze pagina staat een tabel van genen met de bijbehorende
+        beschrijving. In de zoekbalk kun je zoeken op een bepaald
+        trefwoord.
+    </p>
+
+    <form method="POST">
+        <p>
+            Zoek op een trefwoord:
+            <label>
+                <input type="text" name=zoek>
+                <button type="submit">Zoeken</button>
+            </label>
+        </p>
+
+    <h3>De genen met de bijbehorende beschrijving:</h3>
+    <h5>Huidig zoekwoord: <b>{{ zoek }}</b></h5>
+        {% for regel in database %}
+            {% if(zoek == 'None') %}
+                <p> {{ regel }} <p>
+                {% else %}
+                <p>
+                {% for woord in regel %}
+                    {% if(woord.upper() == zoek.upper()) %}
+                    <b>{{ woord }}</b>
+                    {% else %}
+                    {{ woord }}
+                    {% endif %}
+                {% endfor %} </p>
+            {% endif %}
+
+    {% endfor %}
+
+    </form>
+
+</body>
+</html>
