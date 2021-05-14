@@ -70,9 +70,9 @@ def get_article(id_list):
 
 def main():
     # "Cypripedioideae [ab] AND matK [ab]"
-    compounds = open("compounds.txt").read()
-    genes = open("genes.txt").read()
-    molecular = open("molecular_effects.txt").read()
+    compounds = open("small_compounds.txt").read()
+    genes = open("small_genes.txt").read()
+    molecular = open("small_molecular_effects.txt").read()
     making_query(compounds, genes, molecular)
     count, id_list = search_terms("Cypripedioideae [tiab] AND matK ["
                                   "tiab]")
